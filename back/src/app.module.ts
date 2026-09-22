@@ -53,7 +53,7 @@ import { MessageOrmEntity } from './modules/messages/infrastructure/persistence/
             type: 'postgres',
             url: dbConfig.url,
             entities: [MessageOrmEntity],
-            synchronize: true, // Auto-create tables for development/prototyping
+            synchronize: false, // Auto-create tables for development/prototyping
             ssl: sslOptions,
             logging: appConfig?.nodeEnv === 'development',
           };
@@ -83,4 +83,4 @@ import { MessageOrmEntity } from './modules/messages/infrastructure/persistence/
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
