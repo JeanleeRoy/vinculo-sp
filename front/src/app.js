@@ -1,5 +1,6 @@
 import { extractMessageIdFromUrl } from './utils/route.utils.js';
 import { fetchMessageById, NotFoundError } from './services/message.service.js';
+import { initMusicPlayer, ensureMusicPlaying } from './components/music-player.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const stage = document.getElementById('stage');
@@ -34,6 +35,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       stage.style.opacity = '';
       stage.classList.add('ready');
     }
+
+    // Activar reproductor de música de fondo
+    initMusicPlayer();
   } else if (messageId) {
     try {
       const data = await fetchMessageById(messageId);
@@ -67,6 +71,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         stage.style.opacity = '';
         stage.classList.add('ready');
       }
+
+      // Activar reproductor de música de fondo una vez cargada la data
+      initMusicPlayer();
     } catch (err) {
       console.warn('[Vínculo] Error o mensaje no encontrado. Redirigiendo a 404...', err);
       window.location.replace('/404.html');
@@ -100,6 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function abrir() {
       if (stage.classList.contains('opened')) return;
       stage.classList.add('opened');
+      ensureMusicPlaying();
       lanzarParticulas(motor);
       // Desvanece el sobre y arranca el dibujado progresivo del ramo
       setTimeout(() => motor.play(), 1100);

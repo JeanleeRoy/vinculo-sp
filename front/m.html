@@ -108,6 +108,27 @@
     </div>
   </div>
 
+  <!-- REPRODUCTOR VINILO (Se activa solo tras cargar la data del mensaje) -->
+  <div class="vinyl-player" id="vinyl-player" role="button" aria-label="Reproducir o pausar música" tabindex="0">
+    <div class="vinyl-disc" id="vinyl-disc">
+      <div class="vinyl-label">
+        <img src="https://cdn-images.dzcdn.net/images/cover/35601f23fac271b29dd218b284f7a7c6/0x1900-000000-80-0-0.jpg" alt="Floricienta - Flores Amarillas" />
+        <div class="vinyl-hole"></div>
+      </div>
+    </div>
+    <div class="vinyl-overlay" id="vinyl-overlay" aria-hidden="true">
+      <svg class="icon-pause" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+      </svg>
+      <svg class="icon-play" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Contenedor oculto para la reproducción de audio -->
+  <div id="yt-audio-container" style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; overflow: hidden; left: -9999px;"></div>
+
   <!-- Scripts del motor vectorial -->
   <script src="/js/anatomia-flores-amarillas.js"></script>
   <script src="/js/motor.js"></script>

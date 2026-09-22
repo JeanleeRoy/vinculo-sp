@@ -337,3 +337,155 @@ body {
 #nl-badge-frame {
   display: none !important;
 }
+
+/* ===================== REPRODUCTOR VINILO ===================== */
+.vinyl-player {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 58px;
+  height: 58px;
+  z-index: 999;
+  border-radius: 50%;
+  box-shadow: 0 8px 24px rgba(60, 40, 10, 0.35), 0 2px 8px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  user-select: none;
+  display: none;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  outline: none;
+}
+
+.vinyl-player.visible {
+  display: block;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.vinyl-player:focus-visible {
+  box-shadow: 0 0 0 3px rgba(230, 180, 50, 0.6), 0 8px 24px rgba(60, 40, 10, 0.35);
+}
+
+.vinyl-disc {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    #111 0%,
+    #1a1a1a 18%,
+    #2b2b2b 20%,
+    #181818 22%,
+    #252525 35%,
+    #151515 38%,
+    #222222 55%,
+    #111111 58%,
+    #2a2a2a 75%,
+    #0d0d0d 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 0 8px rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: vinyl-spin 5s linear infinite;
+  animation-play-state: paused;
+}
+
+.vinyl-player.playing .vinyl-disc {
+  animation-play-state: running;
+}
+
+.vinyl-label {
+  position: relative;
+  width: 52%;
+  height: 52%;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px rgba(20, 20, 20, 0.9), 0 1px 3px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vinyl-label img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.vinyl-hole {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fcf8e3;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+/* Hover Overlay con icono Play/Pause */
+.vinyl-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(18, 12, 6, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff9e6;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.vinyl-player:hover .vinyl-overlay {
+  opacity: 1;
+}
+
+.vinyl-overlay svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  transition: transform 0.15s ease;
+}
+
+.vinyl-player:hover .vinyl-overlay svg {
+  transform: scale(1.1);
+}
+
+/* Control de iconos Play / Pause */
+.vinyl-overlay .icon-play,
+.vinyl-overlay .icon-pause {
+  display: none;
+}
+
+/* Por defecto o pausado: icono play */
+.vinyl-player .icon-play {
+  display: block;
+}
+
+.vinyl-player.playing .icon-play {
+  display: none;
+}
+
+.vinyl-player.playing .icon-pause {
+  display: block;
+}
+
+@keyframes vinyl-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 600px) {
+  .vinyl-player {
+    bottom: 16px;
+    right: 16px;
+    width: 52px;
+    height: 52px;
+  }
+}
