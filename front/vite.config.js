@@ -7,7 +7,7 @@ export default defineConfig({
       name: 'vinculo-rewrite-m-route',
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
-          if (req.url && req.url.startsWith('/m/') && !req.url.includes('.')) {
+          if (req.url && (req.url.startsWith('/m/') || req.url === '/flores-amarillas' || req.url.startsWith('/flores-amarillas?')) && !req.url.includes('.')) {
             req.url = '/m.html';
           }
           next();
@@ -15,7 +15,7 @@ export default defineConfig({
       },
       configurePreviewServer(server) {
         server.middlewares.use((req, res, next) => {
-          if (req.url && req.url.startsWith('/m/') && !req.url.includes('.')) {
+          if (req.url && (req.url.startsWith('/m/') || req.url === '/flores-amarillas' || req.url.startsWith('/flores-amarillas?')) && !req.url.includes('.')) {
             req.url = '/m.html';
           }
           next();

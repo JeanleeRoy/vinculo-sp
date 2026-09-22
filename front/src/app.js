@@ -13,11 +13,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Extract ID from URL path (e.g. /01a0c612-e632-7616-b163-6fc3a43b2eae or ?id=...)
   const messageId = extractMessageIdFromUrl();
 
-  // If a message ID is in the path or query, fetch from backend API
-  if (messageId) {
+  // Excepción especial para ID 'flores-amarillas': muestra los valores por defecto
+  if (messageId === 'flores-amarillas') {
+    const params = new URLSearchParams(window.location.search);
+    const customNombre = params.get('nombre') || params.get('n');
+
+    if (dateEl) {
+      dateEl.textContent = '21 de septiembre · Día de la primavera';
+    }
+    if (greetingEl) {
+      greetingEl.textContent = customNombre
+        ? `¡Feliz día, ${customNombre.trim().slice(0, 40)}!`
+        : '¡Feliz día, Amig@!';
+    }
+    if (subCaptionEl) {
+      subCaptionEl.textContent = '— con cariño, un regalo de Vinculo 🌻';
+    }
+
+    if (stage) {
+      stage.style.opacity = '';
+      stage.classList.add('ready');
+    }
+  } else if (messageId) {
     try {
       const data = await fetchMessageById(messageId);
-      
+
       // Inject message content into the letter
       if (greetingEl && data.message) {
         greetingEl.textContent = data.message;
