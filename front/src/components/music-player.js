@@ -1,53 +1,44 @@
 /**
- * REPRODUCTOR VINILO — Floricienta (Flores Amarillas)
+ * REPRODUCTOR VINILO
  * ----------------------------------------------------
- * Carga el audio de YouTube de forma transparente, inicia automáticamente al cargar
- * la data del mensaje y gestiona el estado interactivo del disco vinilo.
+ * Reproducción nativa con HTML5 <audio>, desbloqueo confiable en iOS Safari
+ * y soporte para orígenes locales o remotos (CDN / Cloud Storage).
  */
 
-const YT_VIDEO_ID = 'gv63CGCx6vg';
-let playerInstance = null;
-let isPlaying = false;
+let audioElement = null;
 let isInitialized = false;
 
-function sendYtCommand(func, args = []) {
-  const iframe = document.getElementById('yt-player-frame');
-  if (iframe && iframe.contentWindow) {
-    try {
-      iframe.contentWindow.postMessage(
-        JSON.stringify({
-          event: 'command',
-          func: func,
-          args: args,
-        }),
-        '*',
-      );
-    } catch (_) {}
+/**
+ * Resuelve la URL de cualquier pista de audio para páginas o eventos futuros.
+ * - Si se define VITE_AUDIO_CDN_URL (o VITE_CDN_BASE_URL), se antepone la CDN al recurso.
+ * - Si no, se resuelve de forma local: /audio/{track}.
+ * - Si se pasa una URL absoluta (http/https), se respeta tal cual.
+ *
+ * @param {string} [track='flores-amarillas.mp3'] - Nombre de archivo o ruta (ej. 'navidad.mp3', 'eventos/boda.mp3')
+ * @returns {string} URL final del audio
+ */
+export function getAudioSourceUrl(track = 'flores-amarillas.mp3') {
+  if (!track) track = 'flores-amarillas.mp3';
+
+  // Si ya es una URL absoluta externa, se utiliza de inmediato
+  if (/^https?:\/\//i.test(track)) {
+    return track;
   }
+
+  // Normalizar ruta asegurando el prefijo audio/
+  const cleanTrack = track.replace(/^\/+/, '');
+  const relativePath = cleanTrack.startsWith('audio/') ? cleanTrack : `audio/${cleanTrack}`;
+
+  const cdnBase = import.meta.env?.VITE_AUDIO_CDN_URL || import.meta.env?.VITE_CDN_BASE_URL;
+  if (cdnBase) {
+    return `${cdnBase.replace(/\/+$/, '')}/${relativePath}`;
+  }
+
+  return `/${relativePath}`;
 }
 
-function loadYouTubeIframeApi() {
-  return new Promise((resolve) => {
-    if (window.YT && window.YT.Player) {
-      return resolve(window.YT);
-    }
-    const previousOnReady = window.onYouTubeIframeAPIReady;
-    window.onYouTubeIframeAPIReady = () => {
-      if (typeof previousOnReady === 'function') previousOnReady();
-      resolve(window.YT);
-    };
-    if (!document.getElementById('yt-iframe-script')) {
-      const tag = document.createElement('script');
-      tag.id = 'yt-iframe-script';
-      tag.src = 'https://www.youtube.com/iframe_api';
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    }
-  });
-}
 
 function setPlayingState(playing) {
-  isPlaying = playing;
   const vinylPlayer = document.getElementById('vinyl-player');
   if (!vinylPlayer) return;
 
@@ -61,129 +52,111 @@ function setPlayingState(playing) {
 }
 
 export function ensureMusicPlaying() {
-  if (!isInitialized) return;
-
-  if (playerInstance && typeof playerInstance.playVideo === 'function') {
-    try {
-      playerInstance.unMute();
-      playerInstance.playVideo();
-    } catch (_) {}
+  if (!isInitialized) {
+    initMusicPlayer();
   }
+  if (!audioElement) return;
 
-  // Respaldo inmediato vía postMessage directo al iframe
-  sendYtCommand('unMute');
-  sendYtCommand('playVideo');
+  if (audioElement.paused) {
+    const playPromise = audioElement.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((err) => {
+        // En iOS Safari y navegadores con autoplay restringido,
+        // la reproducción se desbloqueará en el primer gesto del usuario.
+        console.debug('[Vínculo] Autoplay en espera de interacción del usuario:', err.name);
+      });
+    }
+  }
 }
 
-export async function initMusicPlayer() {
+export function initMusicPlayer(trackOptions = 'flores-amarillas.mp3') {
+  const track = typeof trackOptions === 'string'
+    ? trackOptions
+    : (trackOptions?.track || 'flores-amarillas.mp3');
+
   if (isInitialized) {
+    if (audioElement) {
+      const audioSrc = getAudioSourceUrl(track);
+      if (audioElement.src !== audioSrc && !audioElement.src.endsWith(audioSrc)) {
+        audioElement.src = audioSrc;
+        audioElement.load();
+      }
+    }
     ensureMusicPlaying();
     return;
   }
 
   const vinylPlayer = document.getElementById('vinyl-player');
-  const ytContainer = document.getElementById('yt-audio-container');
-
-  if (!vinylPlayer || !ytContainer) return;
+  if (!vinylPlayer) return;
 
   isInitialized = true;
 
   // 1. Mostrar el disco vinilo
   vinylPlayer.classList.add('visible');
 
-  // 2. Inyectar iframe con allow="autoplay" para autorizar la reproducción
-  ytContainer.innerHTML = '';
-  const iframe = document.createElement('iframe');
-  iframe.id = 'yt-player-frame';
-  iframe.width = '1';
-  iframe.height = '1';
-  iframe.title = 'Audio Flores Amarillas';
-  iframe.setAttribute('allow', 'autoplay; encrypted-media');
-  iframe.style.border = 'none';
-
-  const originParam = window.location.origin
-    ? `&origin=${encodeURIComponent(window.location.origin)}`
-    : '';
-  iframe.src = `https://www.youtube-nocookie.com/embed/${YT_VIDEO_ID}?enablejsapi=1&autoplay=1&playsinline=1&controls=0&disablekb=1&fs=0&loop=1&playlist=${YT_VIDEO_ID}${originParam}`;
-
-  ytContainer.appendChild(iframe);
-
-  // 3. Escuchar mensajes del iframe para sincronizar el giro del disco en tiempo real
-  window.addEventListener('message', (event) => {
-    try {
-      const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-      if (data && data.event === 'onStateChange') {
-        if (data.info === 1) {
-          // YT.PlayerState.PLAYING
-          setPlayingState(true);
-        } else if (data.info === 2 || data.info === 0) {
-          // YT.PlayerState.PAUSED o ENDED
-          setPlayingState(false);
-        }
-      }
-    } catch (_) {}
-  });
-
-  // 4. Intentar reproducir de inmediato
-  iframe.addEventListener('load', () => {
-    setTimeout(() => {
-      ensureMusicPlaying();
-    }, 100);
-  });
-
-  // 5. Cargar API oficial para control completo (pausa / play)
-  try {
-    const YT = await loadYouTubeIframeApi();
-    playerInstance = new YT.Player('yt-player-frame', {
-      events: {
-        onReady: (event) => {
-          try {
-            event.target.unMute();
-            event.target.playVideo();
-          } catch (_) {}
-        },
-        onStateChange: (event) => {
-          if (event.data === YT.PlayerState.PLAYING) {
-            setPlayingState(true);
-          } else if (
-            event.data === YT.PlayerState.PAUSED ||
-            event.data === YT.PlayerState.ENDED
-          ) {
-            setPlayingState(false);
-          }
-        },
-      },
-    });
-  } catch (err) {
-    console.warn('[Vínculo] Fallback activo para YouTube IFrame', err);
+  // 2. Obtener o crear elemento nativo <audio>
+  let audio = document.getElementById('bg-audio');
+  if (!audio) {
+    audio = new Audio();
+    audio.id = 'bg-audio';
+    audio.preload = 'auto';
+    audio.loop = true;
+    audio.setAttribute('playsinline', '');
+    document.body.appendChild(audio);
   }
 
-  // 6. Si el navegador retiene el autoplay por política de interacción,
-  // cualquier primer toque o clic en la pantalla iniciará el audio sin tener que tocar el disco.
+  const audioSrc = getAudioSourceUrl(track);
+  if (audio.src !== audioSrc && !audio.src.endsWith(audioSrc)) {
+    audio.src = audioSrc;
+  }
+  audio.loop = true;
+
+  audioElement = audio;
+
+  // 3. Sincronizar el estado visual del vinilo con los eventos nativos de audio
+  audio.addEventListener('play', () => setPlayingState(true));
+  audio.addEventListener('pause', () => setPlayingState(false));
+  audio.addEventListener('ended', () => setPlayingState(false));
+  audio.addEventListener('error', (e) => {
+    console.warn('[Vínculo] Error al reproducir audio desde:', audio.src, e);
+  });
+
+  // 4. Intentar reproducir si el navegador lo autoriza inmediatamente
+  ensureMusicPlaying();
+
+  // 5. Desbloqueo garantizado para iOS Safari / mobile
+  // En WebKit, el primer touch o click en cualquier parte de la pantalla desbloquea el elemento de audio
   const handleFirstGesture = () => {
-    if (!isPlaying) {
+    if (audioElement && audioElement.paused) {
       ensureMusicPlaying();
     }
   };
 
-  window.addEventListener('click', handleFirstGesture, { passive: true });
-  window.addEventListener('touchstart', handleFirstGesture, { passive: true });
-  window.addEventListener('pointerdown', handleFirstGesture, { passive: true });
-  window.addEventListener('keydown', handleFirstGesture, { passive: true });
+  const gestureOptions = { passive: true };
+  const removeGestureListeners = () => {
+    window.removeEventListener('click', handleFirstGesture, gestureOptions);
+    window.removeEventListener('touchstart', handleFirstGesture, gestureOptions);
+    window.removeEventListener('pointerdown', handleFirstGesture, gestureOptions);
+    window.removeEventListener('keydown', handleFirstGesture, gestureOptions);
+  };
 
-  // 7. Toggle manual de reproducción al tocar el disco vinilo
+  window.addEventListener('click', handleFirstGesture, gestureOptions);
+  window.addEventListener('touchstart', handleFirstGesture, gestureOptions);
+  window.addEventListener('pointerdown', handleFirstGesture, gestureOptions);
+  window.addEventListener('keydown', handleFirstGesture, gestureOptions);
+
+  // Una vez que comience a reproducir exitosamente, remover los listeners globales
+  audio.addEventListener('play', removeGestureListeners, { once: true });
+
+  // 6. Control manual de reproducción / pausa al interactuar con el vinilo
   const togglePlayback = (e) => {
     e.stopPropagation();
+    if (!audioElement) return;
 
-    if (isPlaying) {
-      if (playerInstance && typeof playerInstance.pauseVideo === 'function') {
-        playerInstance.pauseVideo();
-      }
-      sendYtCommand('pauseVideo');
-      setPlayingState(false);
+    if (!audioElement.paused) {
+      audioElement.pause();
     } else {
       ensureMusicPlaying();
-      setPlayingState(true);
     }
   };
 
