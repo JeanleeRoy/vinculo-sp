@@ -82,7 +82,6 @@ export function initMusicPlayer(trackOptions = 'flores-amarillas.mp3') {
         audioElement.load();
       }
     }
-    ensureMusicPlaying();
     return;
   }
 
@@ -121,11 +120,11 @@ export function initMusicPlayer(trackOptions = 'flores-amarillas.mp3') {
     console.warn('[Vínculo] Error al reproducir audio desde:', audio.src, e);
   });
 
-  // 4. Intentar reproducir si el navegador lo autoriza inmediatamente
-  ensureMusicPlaying();
+  // 4. Iniciar en estado pausado (sin autoplay); la reproducción iniciará solo con un gesto o clic
+  setPlayingState(false);
 
-  // 5. Desbloqueo garantizado para iOS Safari / mobile
-  // En WebKit, el primer touch o click en cualquier parte de la pantalla desbloquea el elemento de audio
+  // 5. Reproducción al primer gesto o clic del usuario (pantalla, móvil o teclado)
+
   const handleFirstGesture = () => {
     if (audioElement && audioElement.paused) {
       ensureMusicPlaying();
