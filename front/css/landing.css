@@ -15,6 +15,8 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
   font-family: Georgia, "Times New Roman", serif;
   color: #3d2b1f;
@@ -30,9 +32,10 @@ body {
 
 .stage {
   position: relative;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
   max-width: 520px;
+  height: 100vh;
+  height: 100dvh;
   margin: auto;
   overflow: hidden;
   opacity: 0;
@@ -98,7 +101,7 @@ body {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 14%;
+  bottom: calc(12% + env(safe-area-inset-bottom, 0px));
   text-align: center;
   color: var(--gold-dark);
   font-size: 14px;
@@ -145,8 +148,8 @@ body {
 .bouquet {
   position: absolute;
   left: 50%;
-  top: 47%;
-  width: min(94vw, 500px);
+  top: 46%;
+  width: min(92vw, 54dvh, 500px);
   aspect-ratio: 1/1;
   transform: translate(-50%, -50%);
   opacity: 0;
@@ -251,7 +254,7 @@ body {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 5%;
+  bottom: calc(3.5% + env(safe-area-inset-bottom, 0px));
   text-align: center;
   padding: 0 24px;
   opacity: 0;
@@ -341,8 +344,8 @@ body {
 /* ===================== REPRODUCTOR VINILO ===================== */
 .vinyl-player {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  right: calc(24px + env(safe-area-inset-right, 0px));
   width: 58px;
   height: 58px;
   z-index: 999;
@@ -483,8 +486,8 @@ body {
 
 @media (max-width: 600px) {
   .vinyl-player {
-    bottom: 16px;
-    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    right: calc(16px + env(safe-area-inset-right, 0px));
     width: 52px;
     height: 52px;
   }
