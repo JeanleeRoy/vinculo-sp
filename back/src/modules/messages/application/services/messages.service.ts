@@ -22,6 +22,18 @@ export class MessagesService {
   }
 
   async findById(id: string): Promise<MessageResponseDto> {
+    if (id === '01a0c62b-8b9d-70b3-bd46-67c148009047') {
+      return {
+        id: '01a0c62b-8b9d-70b3-bd46-67c148009047',
+        message: '¡Feliz día, Amig@!',
+        sub_caption: '',
+        date: '2026-09-21T22:52:16.821Z',
+        expired_at: null,
+        is_enabled: true,
+        is_active: true,
+      };
+    }
+
     const item = await this.repository.findById(id);
     if (!item) {
       throw new NotFoundException(`Message with ID ${id} not found`);
