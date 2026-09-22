@@ -20,6 +20,10 @@ export class CreateMessageDto {
 
   @IsDateString()
   @IsOptional()
+  date?: string;
+
+  @IsDateString()
+  @IsOptional()
   expired_at?: string;
 
   @IsBoolean()

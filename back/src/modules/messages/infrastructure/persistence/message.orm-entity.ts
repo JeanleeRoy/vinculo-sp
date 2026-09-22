@@ -12,7 +12,7 @@ export class MessageOrmEntity {
   @Column({ name: 'sub_caption', type: 'text', nullable: true })
   sub_caption: string | null;
 
-  @CreateDateColumn({ name: 'date', type: 'timestamptz' })
+  @Column({ name: 'date', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   date: Date;
 
   @Column({ name: 'expired_at', type: 'timestamptz', nullable: true })

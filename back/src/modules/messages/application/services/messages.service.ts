@@ -33,7 +33,7 @@ export class MessagesService {
     const created = await this.repository.create({
       message: dto.message,
       subCaption: dto.sub_caption,
-      date: new Date(),
+      date: dto.date ? new Date(dto.date) : new Date(),
       expiredAt: dto.expired_at ? new Date(dto.expired_at) : null,
       isEnabled: dto.is_enabled ?? true,
     });
