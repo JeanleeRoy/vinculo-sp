@@ -45,13 +45,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (subCaptionEl) {
         subCaptionEl.textContent = data.sub_caption || '— con cariño, un regalo de Vínculo 🌻';
       }
-      if (dateEl && data.date) {
-        const parsedDate = new Date(data.date);
-        dateEl.textContent = parsedDate.toLocaleDateString('es-ES', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric',
-        });
+      if (dateEl) {
+        if (data.date) {
+          const parsedDate = new Date(data.date);
+          const hasEvent = Boolean(data.event_name && data.event_name.trim());
+          const formattedDate = parsedDate.toLocaleDateString('es-ES', {
+            day: 'numeric',
+            month: 'long',
+            ...(hasEvent ? {} : { year: 'numeric' }),
+          });
+          dateEl.textContent = hasEvent
+            ? `${formattedDate} · ${data.event_name.trim()}`
+            : formattedDate;
+        } else if (data.event_name && data.event_name.trim()) {
+          dateEl.textContent = data.event_name.trim();
+        }
       }
 
       // Revelar la carta suavemente solo cuando los datos estén listos

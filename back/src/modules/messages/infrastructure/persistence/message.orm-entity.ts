@@ -12,6 +12,9 @@ export class MessageOrmEntity {
   @Column({ name: 'sub_caption', type: 'text', nullable: true })
   sub_caption: string | null;
 
+  @Column({ name: 'event_name', type: 'varchar', length: 255, nullable: true })
+  event_name: string | null;
+
   @Column({ name: 'date', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   date: Date;
 

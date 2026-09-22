@@ -43,6 +43,7 @@ export class TypeOrmMessageRepository implements IMessageRepository {
     const entity = this.repository.create({
       message: data.message,
       sub_caption: data.subCaption ?? null,
+      event_name: data.eventName ?? null,
       date: data.date ?? new Date(),
       expired_at: data.expiredAt ?? null,
       is_enabled: data.isEnabled ?? true,
@@ -57,6 +58,7 @@ export class TypeOrmMessageRepository implements IMessageRepository {
       id: orm.id,
       message: orm.message,
       subCaption: orm.sub_caption,
+      eventName: orm.event_name,
       date: orm.date,
       expiredAt: orm.expired_at,
       isEnabled: orm.is_enabled,

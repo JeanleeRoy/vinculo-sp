@@ -3,6 +3,7 @@ import { MessageDomainEntity } from '../entities/message.domain-entity';
 export interface CreateMessageData {
   message: string;
   subCaption?: string | null;
+  eventName?: string | null;
   date?: Date;
   expiredAt?: Date | null;
   isEnabled?: boolean;

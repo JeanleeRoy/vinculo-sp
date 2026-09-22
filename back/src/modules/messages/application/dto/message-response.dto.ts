@@ -4,6 +4,7 @@ export class MessageResponseDto {
   id: string;
   message: string;
   sub_caption: string | null;
+  event_name: string | null;
   date: string;
   expired_at: string | null;
   is_enabled: boolean;
@@ -14,6 +15,7 @@ export class MessageResponseDto {
     dto.id = entity.id;
     dto.message = entity.message;
     dto.sub_caption = entity.subCaption;
+    dto.event_name = entity.eventName;
     dto.date = entity.date.toISOString();
     dto.expired_at = entity.expiredAt ? entity.expiredAt.toISOString() : null;
     dto.is_enabled = entity.isEnabled;

@@ -27,6 +27,7 @@ export class MessagesService {
         id: '01a0c62b-8b9d-70b3-bd46-67c148009047',
         message: '¡Feliz día, Amig@!',
         sub_caption: '',
+        event_name: 'Día de la primavera',
         date: '2026-09-21T22:52:16.821Z',
         expired_at: null,
         is_enabled: true,
@@ -45,6 +46,7 @@ export class MessagesService {
     const created = await this.repository.create({
       message: dto.message,
       subCaption: dto.sub_caption,
+      eventName: dto.event_name,
       date: dto.date ? new Date(dto.date) : new Date(),
       expiredAt: dto.expired_at ? new Date(dto.expired_at) : null,
       isEnabled: dto.is_enabled ?? true,

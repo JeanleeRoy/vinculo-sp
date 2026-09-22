@@ -18,6 +18,11 @@ export class CreateMessageDto {
   @MaxLength(255)
   sub_caption?: string;
 
+  @IsString()
+  @IsOptional()
+  @MaxLength(255)
+  event_name?: string;
+
   @IsDateString()
   @IsOptional()
   date?: string;

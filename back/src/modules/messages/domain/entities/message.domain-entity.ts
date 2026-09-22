@@ -2,6 +2,7 @@ export class MessageDomainEntity {
   id: string;
   message: string;
   subCaption: string | null;
+  eventName: string | null;
   date: Date;
   expiredAt: Date | null;
   isEnabled: boolean;
