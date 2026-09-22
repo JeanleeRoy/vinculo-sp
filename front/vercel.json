@@ -1,0 +1,7 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/m/:match*", "destination": "/m.html" },
+    { "source": "/flores-amarillas", "destination": "/m.html" }
+  ]
+}
