@@ -251,8 +251,13 @@ body {
   transform: scale(1.08);
 }
 
-.nav-arrow.left { left: 4%; }
-.nav-arrow.right { right: 4%; }
+.nav-arrow.left {
+  left: 4%;
+}
+
+.nav-arrow.right {
+  right: 4%;
+}
 
 /* ================= SURROUNDING FEATURE CARDS ================= */
 .feature-card {
@@ -506,15 +511,18 @@ body {
     flex-direction: column;
     padding-bottom: 2rem;
   }
+
   .arch-backdrop {
     display: none;
   }
+
   .feature-card {
     position: static;
     width: 100%;
     max-width: 320px;
     margin: 0.75rem auto;
   }
+
   .cards-mobile-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -522,9 +530,12 @@ body {
     width: 100%;
     margin-top: 2rem;
   }
-  .curve-connector, .nav-arrow {
+
+  .curve-connector,
+  .nav-arrow {
     display: none;
   }
+
   .steps-grid {
     grid-template-columns: 1fr;
     gap: 1.25rem;
@@ -535,7 +546,12 @@ body {
   .cards-mobile-grid {
     grid-template-columns: 1fr;
   }
+
   .hero-headline {
     margin-bottom: 2rem;
   }
+}
+
+#nl-badge-frame {
+  display: none !important;
 }
